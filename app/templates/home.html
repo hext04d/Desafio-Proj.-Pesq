@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Bem-vindo</title>
+</head>
+<body>
+  <h1>Bem-vindo, {{ user['name'] }}!</h1>
+  <p><strong>Usuário:</strong> {{ user['preferred_username'] }}</p>
+  <p><strong>Email:</strong> {{ user['email'] }}</p>
+  <p><strong>Nível de Acesso:</strong> {{ user['nivel_acesso'] }}</p>
+
+  <a href="/logout">Logout</a>
+</body>
+</html>

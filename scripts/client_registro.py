@@ -28,10 +28,10 @@ access_token = token_resp.json()["access_token"]
 registration_url = f"{KEYCLOAK_URL}/realms/{REALM}/clients-registrations/openid-connect"
 client_data = {
     "client_name": "novo-client",
-    "redirect_uris": ["http://localhost:3000/callback"],
+    "redirect_uris": ["http://localhost:5000/callback"],
     "grant_types": ["authorization_code"],
     "response_types": ["code"],
-    "token_endpoint_auth_method": "none"
+    "token_endpoint_auth_method": "none",
 }
 
 response = requests.post(
