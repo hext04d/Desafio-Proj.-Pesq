@@ -25,8 +25,29 @@ resource "keycloak_realm" "teste" {
   registration_allowed = true
   login_with_email_allowed = true
   reset_password_allowed   = true
-}
+  remember_me = true
+  verify_email = true
 
+  internationalization {
+    supported_locales = [
+      "en",
+      "pt-BR",
+      "es"
+    ]
+    default_locale    = "pt-BR"
+  }
+
+  smtp_server {
+    host = "smtp.testerealm.com"
+    from = "admin@testerealm.com"
+
+    auth {
+      username = "admin"
+      password = "adminmail"
+    }
+  }
+}
+ 
 #======================================================================
 #cria um grupo no realm teste com o nome de admins e nivel de acesso alto.
 resource "keycloak_group" "admins" {

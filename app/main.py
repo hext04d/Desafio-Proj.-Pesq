@@ -2,14 +2,14 @@ from flask import Flask, redirect, url_for, session, request, render_template
 from authlib.integrations.flask_client import OAuth
 from config import DISCOVERY_URL, OIDC_CLIENT_ID, REDIRECT_URI
 import json
+import secrets
 
 app = Flask(__name__)
-app.secret_key =  'secret'
+app.secret_key = 'secret'
 
-#oauth
 oauth = OAuth(app)
 oauth.register(
-    name = 'keycloak',
+    name='keycloak',
     client_id=OIDC_CLIENT_ID,
     client_kwargs={
         'scope': 'openid profile email',
@@ -25,17 +25,22 @@ def index():
 @app.route('/login')
 def login():
     redirect_uri = url_for('callback', _external=True)
-    return oauth.keycloak.authorize_redirect(redirect_uri)
+    nonce = secrets.token_urlsafe()
+    session['nonce'] = nonce
+    return oauth.keycloak.authorize_redirect(redirect_uri, nonce=nonce)
 
 @app.route('/callback')
 def callback():
     token = oauth.keycloak.authorize_access_token()
-    userinfo = oauth.keycloak.parse_id_token(token)
+    nonce = session.pop('nonce', None)
+    userinfo = oauth.keycloak.parse_id_token(token, nonce=nonce)
 
-    if userinfo.get('acr') == 'high':
-        return render_template('totp.html')
+    acr = userinfo.get('acr', '0')
 
-    nivel = userinfo.get('nivel_acesso')
+    if acr != '2':
+        return render_template('denied.html', nivel="baixo (sem TOTP)")
+
+    nivel = userinfo.get('nivel_acesso', 'desconhecido')
     if nivel != 'alto':
         return render_template('denied.html', nivel=nivel)
 
