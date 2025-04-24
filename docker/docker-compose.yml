@@ -11,3 +11,19 @@ services:
       KC_DDB: dev-mem
     volumes:
       - ./docker/keycloak_data:/opt/keycloak/data
+
+  terraform:
+    image: hashicorp/terraform:latest
+    container_name: terraform
+    command: ["terraform", "--version"]
+    volumes:
+      - ./docker/terraform:/workspace
+    working_dir: /workspace
+
+  python:
+    image: python:3.10-slim
+    container_name: python
+    command: ["python3", "--version"]
+    volumes:
+      - ./docker/python:/usr/src/app
+    working_dir: /usr/src/app

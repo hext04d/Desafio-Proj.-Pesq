@@ -1,7 +1,6 @@
 from flask import Flask, redirect, url_for, session, request, render_template
 from authlib.integrations.flask_client import OAuth
 from config import DISCOVERY_URL, OIDC_CLIENT_ID, REDIRECT_URI
-import json
 import secrets
 
 app = Flask(__name__)
@@ -20,7 +19,7 @@ oauth.register(
 
 @app.route('/')
 def index():
-    return '<a href="/login">login com keycloak</a>'
+    return '<a href="/login">Login com Keycloak</a>'
 
 @app.route('/login')
 def login():
@@ -35,43 +34,36 @@ def callback():
     nonce = session.pop('nonce', None)
     userinfo = oauth.keycloak.parse_id_token(token, nonce=nonce)
 
-    acr = userinfo.get('acr', '0')
+    print("ACR recebido:", userinfo.get('acr'))
 
-    if acr != '2':
-        return render_template('denied.html', nivel="baixo (sem TOTP)")
-
-    nivel = userinfo.get('nivel_acesso', 'desconhecido')
-    if nivel != 'alto':
-        return render_template('denied.html', nivel=nivel)
-
+    # Armazenar o token de acesso na sessão
+    session['access_token'] = token.get('access_token')
     session['user'] = userinfo
-    return redirect(url_for('home'))
+    print("Userinfo completo:", userinfo)
 
-@app.route('/totp', methods=['POST'])
-def totp():
-    totp_code = request.form.get('totp_code')
-
-    if verify_totp_code(totp_code):
-        session['user']['nivel_acesso'] = 'alto'
-        return redirect(url_for('home'))
+    acr = userinfo.get('acr', '0')
+    if acr == '2':
+        return render_template('nivel_alto.html', user=userinfo)
     else:
-        return render_template('totp.html', error="Código TOTP inválido")
+        return render_template('nivel_baixo.html', user=userinfo)
+
 
 @app.route('/home')
 def home():
     user = session.get('user')
     if not user:
         return redirect(url_for('login'))
-    
     return render_template('home.html', user=user)
+
+@app.route('/conta')
+def conta():
+    # Redireciona para a tela de configurações do Keycloak
+    return redirect("http://localhost:8080/realms/teste/account")
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
-
-def verify_totp_code(totp_code):
-    return True
 
 if __name__ == '__main__':
     app.run(debug=True)
