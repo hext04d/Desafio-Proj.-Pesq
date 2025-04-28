@@ -1,0 +1,19 @@
+stages:
+  - build
+  - test
+
+build_images:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t app-flask .
+
+test_application:
+  stage: test
+  image: python:3.10-slim
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - python test_app.py
