@@ -19,7 +19,7 @@ oauth.register(
 
 @app.route('/')
 def index():
-    return '<a href="/login">Login com Keycloak</a>'
+    return render_template('index.html')
 
 @app.route('/login')
 def login():

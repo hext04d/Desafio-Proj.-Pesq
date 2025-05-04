@@ -1,7 +1,27 @@
-<h1>Autenticação de baixo nível</h1>
-<p>Você não usou TOTP.</p>
-<p>Bem-vindo, {{ user.preferred_username }}</p>
-<a href="{{ url_for('conta') }}">
-    <button>Acessar configurações da conta</button>
-  </a>
-  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrou :)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="text-container">
+    <h1>Autenticação de baixo nível</h1>
+    <p>Você não usou TOTP.</p>
+    <p>Bem-vindo, {{ user.preferred_username }}</p>
+  </div>
+
+  <div class="button-container">
+    <a href="{{ url_for('conta') }}">
+      <button>Acessar configurações da conta</button>
+    </a>
+    <a href="{{ url_for('logout') }}">
+      <button>Sair</button>
+    </a>
+  </div>
+
+</body>
+</html>
